@@ -1,6 +1,6 @@
 **DFS-lineup-generator**
 
-A machine learning approach to lineup predictions for Daily Fantasy on Draftkings.
+A machine learning approach to lineup predictions for Daily Fantasy Basketball on Draftkings.
 
 Run src/lineup_pipeline_main.py to generate a lineup for the current day. Script prints full lineup along with its total Fantasy Points predicted. 
 
