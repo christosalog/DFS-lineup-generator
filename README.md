@@ -1,4 +1,4 @@
-DFS-lineup-generator
+**DFS-lineup-generator**
 
 A machine learning approach to lineup predictions for Daily Fantasy on Draftkings.
 
