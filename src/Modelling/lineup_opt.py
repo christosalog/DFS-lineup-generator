@@ -8,6 +8,77 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
 
+def fill_position(pos, player_pos_list):
+    if pos == 'PG':
+        pg = [pp for pp in player_pos_list if pp[1]=='PG']
+        pgsg = [pp for pp in player_pos_list if 'PG' in pp[1]]
+        if len(pg) > 0:
+            player = pg[0][0]
+            player_pos_list.remove(pg[0])
+            return player, player_pos_list
+        elif len(pgsg) > 0:
+            player = pgsg[0][0]
+            player_pos_list.remove(pgsg[0])
+            return player, player_pos_list
+    elif pos == 'SG':
+        sg = [pp for pp in player_pos_list if pp[1]=='SG']
+        pgsg = [pp for pp in player_pos_list if 'SG' in pp[1]]
+        if len(sg) > 0:
+            player = sg[0][0]
+            player_pos_list.remove(sg[0])
+            return player, player_pos_list
+        elif len(pgsg) > 0:
+            player = pgsg[0][0]
+            player_pos_list.remove(pgsg[0])
+            return player, player_pos_list
+    elif pos == 'SF':
+        sf = [pp for pp in player_pos_list if pp[1]=='SF']
+        sfpf = [pp for pp in player_pos_list if 'SF' in pp[1]]
+        if len(sf) > 0:
+            player = sf[0][0]
+            player_pos_list.remove(sf[0])
+            return player, player_pos_list
+        elif len(sfpf) > 0:
+            player = sfpf[0][0]
+            player_pos_list.remove(sfpf[0])
+            return player, player_pos_list
+    elif pos == 'PF':
+        pf = [pp for pp in player_pos_list if pp[1]=='PF']
+        sfpf = [pp for pp in player_pos_list if 'PF' in pp[1]]
+        if len(pf) > 0:
+            player = pf[0][0]
+            player_pos_list.remove(pf[0])
+            return player, player_pos_list
+        elif len(sfpf) > 0:
+            player = sfpf[0][0]
+            player_pos_list.remove(sfpf[0])
+            return player, player_pos_list
+    elif pos == 'C':
+        center = [pp for pp in player_pos_list if pp[1]=='C']
+        pfc = [pp for pp in player_pos_list if 'C' in pp[1]]
+        if len(center) > 0:
+            player = center[0][0]
+            player_pos_list.remove(center[0])
+            return player, player_pos_list
+        elif len(pfc) > 0:
+            player = pfc[0][0]
+            player_pos_list.remove(pfc[0])
+            return player, player_pos_list
+    elif pos == 'G':
+        guard = [pp for pp in player_pos_list if 'G' in pp[1]]
+        player = guard[0][0]
+        player_pos_list.remove(guard[0])
+        return player, player_pos_list
+    elif pos == 'F':
+        forward = [pp for pp in player_pos_list if 'F' in pp[1]]
+        player = forward[0][0]
+        player_pos_list.remove(forward[0])
+        return player, player_pos_list
+    elif pos == 'UTIL':
+        player = player_pos_list[0][0]
+        player_pos_list.pop()
+        return player, player_pos_list
+
 def optimize_dk_lineup(day_df):
     df_today = day_df.copy()
     df_today.reset_index(drop = True, inplace = True)
@@ -15,7 +86,7 @@ def optimize_dk_lineup(day_df):
     #requirements
     salary_cap = 50000
     num_players = len(df_today.index)
-    positions = {'PG':[], 'SG':[], 'SF':[], 'PF':[], 'C':[]}
+    positions = {'PG': [], 'SG': [], 'SF': [], 'PF': [], 'C': []}
 
     '''add players into positions (STEP DEPENDENT ON df_today)'''
     ''' Note: players with multiple positions might appear more than once - may need a constraint for that'''
@@ -60,56 +131,32 @@ def optimize_dk_lineup(day_df):
         else:
             lineup_copy.append(0)
 
-    filled_lineups = []
-    for lineup in [lineup_copy]:
-        a_lineup = ["", "", "", "", "", "", "", ""]
+    ind_list = []
+    for x, y in enumerate(lineup_copy):
+        if y == 1:
+            ind_list.append(x)
 
-        # players_lineup = lineup_copy[num_players]
-        total_proj = 0
-        # if actuals:
-        #     total_actual = 0
-        for num, player in enumerate(lineup_copy):
-            if player > 0.9 and player < 1.1:
-                if positions['PG'][num] == 1:
-                    if a_lineup[0] == "":
-                        a_lineup[0] = df_today.loc[num, 'Name']
-                    elif a_lineup[5] == "":
-                        a_lineup[5] = df_today.loc[num, 'Name']
-                    elif a_lineup[7] == "":
-                        a_lineup[7] = df_today.loc[num, 'Name']
-                elif positions['SG'][num] == 1:
-                    if a_lineup[1] == "":
-                        a_lineup[1] = df_today.loc[num, 'Name']
-                    elif a_lineup[5] == "":
-                        a_lineup[5] = df_today.loc[num, 'Name']
-                    elif a_lineup[7] == "":
-                        a_lineup[7] = df_today.loc[num, 'Name']
-                elif positions['SF'][num] == 1:
-                    if a_lineup[2] == "":
-                        a_lineup[2] = df_today.loc[num, 'Name']
-                    elif a_lineup[6] == "":
-                        a_lineup[6] = df_today.loc[num, 'Name']
-                    elif a_lineup[7] == "":
-                        a_lineup[7] = df_today.loc[num, 'Name']
-                elif positions['PF'][num] == 1:
-                    if a_lineup[3] == "":
-                        a_lineup[3] = df_today.loc[num, 'Name']
-                    elif a_lineup[6] == "":
-                        a_lineup[6] = df_today.loc[num, 'Name']
-                    elif a_lineup[7] == "":
-                        a_lineup[7] = df_today.loc[num, 'Name']
-                elif positions['C'][num] == 1:
-                    if a_lineup[4] == "":
-                        a_lineup[4] = df_today.loc[num, 'Name']
-                    elif a_lineup[7] == "":
-                        a_lineup[7] = df_today.loc[num, 'Name']
-                total_proj += df_today.loc[num, 'FPTS']
-                # if actuals:
-                #     total_actual += skaters_df.loc[num, 'actual']
-        a_lineup.append(round(total_proj, 2))
-        # if actuals:
-        #     a_lineup.append(round(total_actual, 2))
-        filled_lineups.append(a_lineup)
+    players = [df_today.loc[i, 'Name'] for i in ind_list]
+    positions = [df_today.loc[i, 'Pos'] for i in ind_list]
+    fpts = [df_today.loc[i, 'FPTS'] for i in ind_list]
+    total_predicted_fpts = sum(fpts)
 
-        return filled_lineups
+    player_positions_list = [(player, pos) for player, pos in zip(players, positions)]
+
+    lineup_dict = {'PG': '',
+                   'SG': '',
+                   'SF': '',
+                   'PF': '',
+                   'C': '',
+                   'G': '',
+                   'F': '',
+                   'UTIL': ''
+                   }
+    lineup_slots = ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL']
+    player_pos = player_positions_list.copy()
+    for position in lineup_slots:
+        player, player_pos = fill_position(position, player_pos)
+        lineup_dict[position] = player
+
+    return lineup_dict, total_predicted_fpts
 
