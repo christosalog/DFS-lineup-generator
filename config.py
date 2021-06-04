@@ -1,7 +1,7 @@
 import os
 dirpath = os.path.dirname(os.path.abspath(__file__))
 print(dirpath)
-TRAIN_PATH = os.path.join(dirpath, 'data', 'model_data_080421.csv')
+TRAIN_PATH = os.path.join(dirpath, 'data', 'season_data_2021.csv')
 
 TARGET = 'FPTS'
 

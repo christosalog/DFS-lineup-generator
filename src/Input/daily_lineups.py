@@ -7,6 +7,8 @@ def get_daily_lineups():
     lineup_url = 'https://rotogrinders.com/lineups/nba?site=draftkings'
     soup_summaries = BeautifulSoup(urlopen(lineup_url), 'lxml')
     date = soup_summaries.find('li', class_='date-content').get_text().strip('th') + ' ' + str(datetime.now().year)
+    if 'Jun' in date:
+        date = date.replace('Jun', 'June')
     date = datetime.strptime(date, '%A, %B %d %Y').strftime('%Y%m%d')
     games = soup_summaries.find_all('ul', class_='lst lineup')
     lineup_cards = games[0].find_all('li', {'data-role': 'lineup-card'})
