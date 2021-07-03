@@ -37,3 +37,5 @@ RANDOM_STATE = 123
 TRAINED_MODEL_DIR = os.path.join(dirpath, 'models', 'trained_models/')
 
 TRAINED_MODEL = os.path.join(dirpath, 'prod_models', 'final_model_rf_2021-04-15.pickle')
+
+TRAIN_LOG = os.path.join(dirpath, 'data', 'model_training_log.csv')

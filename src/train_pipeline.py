@@ -16,8 +16,8 @@ from src.Utils.data_managemeent import load_dataset
 from src.Modelling import hp_config
 from src import __version__ as _version
 
-def run_training(df):
 
+def run_training(df):
     # get today's date
     today = date.today()
 
@@ -28,7 +28,6 @@ def run_training(df):
     # sort values by date, name
     df = df.sort_values(by=['Date', 'Name']).reset_index(drop=True)
 
-
     target = config.TARGET
     predictors = config.PREDICTORS
 
@@ -38,7 +37,8 @@ def run_training(df):
     X = df.drop(target, axis=1)
 
     # split dataset
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=config.TRAIN_TEST_SPLIT, random_state=config.RANDOM_STATE)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=config.TRAIN_TEST_SPLIT,
+                                                        random_state=config.RANDOM_STATE)
 
     # make pipielines
     pipelines = {
@@ -79,12 +79,22 @@ def run_training(df):
         with open(config.TRAINED_MODEL_DIR + '/' + _version + '/' + _version + '_' + name + '_' + str(
                 model.best_score_) + '.pickle', 'wb') as f:
             pickle.dump(fitted_models[name].best_estimator_, f)
+        # Update train log
+        new_row = {'Version': _version,
+                   'DateTrained': today,
+                   'Model': name,
+                   'HyperparameterRanges': hyperparameters[name],
+                   'MinDate': df.Date.min(),
+                   'MaxDate': df.Date.max(),
+                   'RandomState': config.RANDOM_STATE,
+                   'Features': config.PREDICTORS}
+        train_log = pd.read_csv(config.TRAIN_LOG)
+
+        upd_train_log = train_log.append(new_row, ignore_index=True)
+        upd_train_log.to_csv(config.TRAIN_LOG, index=False)
 
         # Print '{name} has been fitted'
         print(name, 'has been fitted.')
-
-
-
 
 
 if __name__ == "__main__":
