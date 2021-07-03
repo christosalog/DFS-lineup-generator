@@ -1,13 +1,8 @@
-import config
-from src.Utils.data_managemeent import load_dataset
-
 import pandas as pd
 import numpy as np
 from datetime import date
 import pickle
 import os
-
-from src.Configs import config, hp_config
 
 from sklearn.linear_model import ElasticNet, Ridge, Lasso
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -15,6 +10,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
+
+import config
+from src.Utils.data_managemeent import load_dataset
+from src.Modelling import hp_config
+from src import __version__ as _version
 
 def run_training(df):
 
@@ -65,17 +65,18 @@ def run_training(df):
 
     # Loop through model pipelines, tuning each one and saving it to fitted_models
     for name, pipeline in pipelines.items():
-        if not os.path.exists(r'/Users/admin/Documents/Data Science/Project Answer/Models/' + str(today)):
-            os.makedirs(r'/Users/admin/Documents/Data Science/Project Answer/Models/' + (today))
+        if not os.path.exists(config.TRAINED_MODEL_DIR + str(_version)):
+            os.makedirs(config.TRAINED_MODEL_DIR + (_version))
         # Create cross-validation object from pipeline and hyperparameters
         model = GridSearchCV(pipeline, hyperparameters[name], cv=10, n_jobs=-1)
 
         # Fit model on X_train, y_train
+        print('Training the ', name, ' model...')
         model.fit(X_train[predictors], y_train)
 
         # Store model in fitted_models[name]
         fitted_models[name] = model
-        with open(r'/Users/admin/Documents/Data Science/Project Answer/Models/' + today + '/final_model_' + name + '_' + str(
+        with open(config.TRAINED_MODEL_DIR + '/' + _version + '/' + _version + '_' + name + '_' + str(
                 model.best_score_) + '.pickle', 'wb') as f:
             pickle.dump(fitted_models[name].best_estimator_, f)
 
@@ -83,5 +84,9 @@ def run_training(df):
         print(name, 'has been fitted.')
 
 
+
+
+
 if __name__ == "__main__":
-    run_training()
+    train_data = load_dataset(config.TRAIN_PATH, config.load_params)
+    run_training(train_data)

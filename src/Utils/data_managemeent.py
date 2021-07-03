@@ -7,3 +7,6 @@ def load_dataset(file, params):
     train_data = data[(data.Date >= params['start_date'])|(data.Date >= params['end_date'])]
 
     return train_data
+
+# def log_model_details():
+#
